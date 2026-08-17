@@ -9,8 +9,9 @@ static CoreContext *core_ctx_get(void) {
   return &ctx;
 }
 
-static void core_init(void) {
+static Result core_init(void) {
   CoreContext *ctx = core_ctx_get();
+  Result r;
 
   log_init();
   log_set_level(LOG_LEVEL_INFO);
@@ -18,31 +19,45 @@ static void core_init(void) {
   log_info("Engine starting");
 
   ctx->renderer = renderer_get_raylib();
-  ctx->input = input_get_raylib();
-  ctx->audio = audio_get_raylib();
+  ctx->input    = input_get_raylib();
+  ctx->audio    = audio_get_raylib();
 
-  ctx->window.width = 800;
+  ctx->window.width  = 800;
   ctx->window.height = 600;
-  ctx->window.title = "Bebis64";
-  ctx->window.flags = FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT;
+  ctx->window.title  = "Bebis64";
+  ctx->window.flags  = FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT;
 
-  ctx->fixed_step = CORE_DEFAULT_FIXED_STEP;
+  ctx->fixed_step  = CORE_DEFAULT_FIXED_STEP;
   ctx->accumulator = 0.0f;
-  ctx->frame_time = 0.0f;
+  ctx->frame_time  = 0.0f;
 
   log_info("Creating window: %dx%d [%s]", ctx->window.width, ctx->window.height,
            ctx->window.title);
-  ctx->renderer->init(ctx->window.width, ctx->window.height, ctx->window.title,
-                      ctx->window.flags);
+  r = ctx->renderer->init(ctx->window.width, ctx->window.height, ctx->window.title,
+                          ctx->window.flags);
+  if (!RESULT_IS_OK(r)) {
+    log_error("Renderer init failed: %s", r.message);
+    return r;
+  }
+
   log_info("Engine ready");
+  return result_ok();
 }
 
-static void core_unload(void) {
+static Result core_unload(void) {
   CoreContext *ctx = core_ctx_get();
+  Result r;
+
   log_info("Engine shutting down");
-  if (ctx->renderer->shutdown)
-    ctx->renderer->shutdown();
+
+  if (ctx->renderer->shutdown) {
+    r = ctx->renderer->shutdown();
+    if (!RESULT_IS_OK(r))
+      log_error("Renderer shutdown failed: %s", r.message);
+  }
+
   log_shutdown();
+  return result_ok();
 }
 
 static void core_update(float dt) { (void)dt; }
@@ -58,7 +73,7 @@ static void core_loop(void) {
   CoreContext *ctx = core_ctx_get();
 
   while (!ctx->renderer->should_close()) {
-    ctx->frame_time = ctx->renderer->get_delta();
+    ctx->frame_time  = ctx->renderer->get_delta();
     ctx->accumulator = ctx->frame_time;
 
     while (ctx->accumulator >= ctx->fixed_step) {
@@ -70,8 +85,15 @@ static void core_loop(void) {
   }
 }
 
-void core_run(void) {
-  core_init();
+Result core_run(void) {
+  Result r;
+
+  r = core_init();
+  if (!RESULT_IS_OK(r))
+    return r;
+
   core_loop();
-  core_unload();
+
+  r = core_unload();
+  return r;
 }
