@@ -1,5 +1,5 @@
-#ifndef BEBIS64_wINDOW_H
-#define BEBIS64_wINDOW_H
+#ifndef BEBIS64_WINDOW_H
+#define BEBIS64_WINDOW_H
 
 typedef struct WindowSettings {
   int width;
@@ -10,4 +10,4 @@ typedef struct WindowSettings {
 
 WindowSettings window_init(void);
 
-#endif // BEBIS64_wINDOW_H
+#endif // BEBIS64_WINDOW_H

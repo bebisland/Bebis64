@@ -57,3 +57,4 @@ dkms.conf
 build/
 bin/
 compile_commands.json
+.cache

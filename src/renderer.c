@@ -1,0 +1,39 @@
+#include "renderer.h"
+#include "raylib.h"
+
+static void renderer_init(int width, int height, const char *title) {
+  InitWindow(width, height, title);
+}
+
+static void renderer_begin(void) {
+  BeginDrawing();
+}
+
+static void renderer_clear(void) {
+  ClearBackground(BLACK);
+}
+
+static void renderer_end(void) {
+  EndDrawing();
+}
+
+static void renderer_shutdown(void) {
+  CloseWindow();
+}
+
+static int renderer_should_close(void) {
+  return WindowShouldClose();
+}
+
+static Renderer renderer_raylib = {
+  renderer_init,
+  renderer_begin,
+  renderer_clear,
+  renderer_end,
+  renderer_shutdown,
+  renderer_should_close
+};
+
+Renderer *renderer_get_raylib(void) {
+  return &renderer_raylib;
+}

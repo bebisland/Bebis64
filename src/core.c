@@ -1,6 +1,5 @@
 #include "core.h"
 #include "raylib.h"
-#include "window.h"
 
 static CoreContext *core_ctx_get(void) {
   static CoreContext ctx = {0};
@@ -11,19 +10,32 @@ static void core_init(void) {
   CoreContext *ctx = core_ctx_get();
   SetTraceLogLevel(LOG_ERROR);
 
-  ctx->window = window_init();
+  ctx->renderer = renderer_get_raylib();
+  ctx->input    = input_get_raylib();
+  ctx->audio    = audio_get_raylib();
+
+  ctx->window.width  = 800;
+  ctx->window.height = 600;
+  ctx->window.title  = "Bebis64";
+
+  ctx->renderer->init(ctx->window.width, ctx->window.height, ctx->window.title);
 }
 
-static void core_unload(void) { CloseWindow(); }
+static void core_unload(void) {
+  CoreContext *ctx = core_ctx_get();
+  if (ctx->renderer->shutdown) ctx->renderer->shutdown();
+}
 
 static void core_render(void) {
-  BeginDrawing();
-  ClearBackground(BLACK);
-  EndDrawing();
+  CoreContext *ctx = core_ctx_get();
+  ctx->renderer->begin();
+  ctx->renderer->clear();
+  ctx->renderer->end();
 }
 
 static void core_loop(void) {
-  while (!WindowShouldClose()) {
+  CoreContext *ctx = core_ctx_get();
+  while (!ctx->renderer->should_close()) {
     core_render();
   }
 }
