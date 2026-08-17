@@ -1,10 +1,12 @@
 #include "renderer.h"
+#include "log.h"
 #include "raylib.h"
 
 static void renderer_init(int width, int height, const char *title,
                           unsigned char flags) {
   SetConfigFlags(flags);
   InitWindow(width, height, title);
+  log_info("Window created: %dx%d [%s]", width, height, title);
 }
 
 static void renderer_begin(void) { BeginDrawing(); }
@@ -13,7 +15,10 @@ static void renderer_clear(void) { ClearBackground(BLACK); }
 
 static void renderer_end(void) { EndDrawing(); }
 
-static void renderer_shutdown(void) { CloseWindow(); }
+static void renderer_shutdown(void) {
+  CloseWindow();
+  log_info("Window destroyed");
+}
 
 static int renderer_should_close(void) { return WindowShouldClose(); }
 
