@@ -3,6 +3,7 @@
 #include "raylib.h"
 
 #define CORE_DEFAULT_FIXED_STEP (1.0f / 60.0f)
+#define CORE_FRAME_ARENA_SIZE (16 * 1024 * 1024)
 
 static CoreContext *core_ctx_get(void) {
   static CoreContext ctx = {0};
@@ -19,22 +20,28 @@ static Result core_init(void) {
   log_info("Engine starting");
 
   ctx->renderer = renderer_get_raylib();
-  ctx->input    = input_get_raylib();
-  ctx->audio    = audio_get_raylib();
+  ctx->input = input_get_raylib();
+  ctx->audio = audio_get_raylib();
 
-  ctx->window.width  = 800;
+  ctx->window.width = 800;
   ctx->window.height = 600;
-  ctx->window.title  = "Bebis64";
-  ctx->window.flags  = FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT;
+  ctx->window.title = "Bebis64";
+  ctx->window.flags = FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT;
 
-  ctx->fixed_step  = CORE_DEFAULT_FIXED_STEP;
+  ctx->fixed_step = CORE_DEFAULT_FIXED_STEP;
   ctx->accumulator = 0.0f;
-  ctx->frame_time  = 0.0f;
+  ctx->frame_time = 0.0f;
+
+  r = arena_create(&ctx->frame_arena, CORE_FRAME_ARENA_SIZE);
+  if (!RESULT_IS_OK(r)) {
+    log_error("Frame arena creation failed: %s", r.message);
+    return r;
+  }
 
   log_info("Creating window: %dx%d [%s]", ctx->window.width, ctx->window.height,
            ctx->window.title);
-  r = ctx->renderer->init(ctx->window.width, ctx->window.height, ctx->window.title,
-                          ctx->window.flags);
+  r = ctx->renderer->init(ctx->window.width, ctx->window.height,
+                          ctx->window.title, ctx->window.flags);
   if (!RESULT_IS_OK(r)) {
     log_error("Renderer init failed: %s", r.message);
     return r;
@@ -56,6 +63,7 @@ static Result core_unload(void) {
       log_error("Renderer shutdown failed: %s", r.message);
   }
 
+  arena_destroy(&ctx->frame_arena);
   log_shutdown();
   return result_ok();
 }
@@ -73,7 +81,9 @@ static void core_loop(void) {
   CoreContext *ctx = core_ctx_get();
 
   while (!ctx->renderer->should_close()) {
-    ctx->frame_time  = ctx->renderer->get_delta();
+    arena_reset(&ctx->frame_arena);
+
+    ctx->frame_time = ctx->renderer->get_delta();
     ctx->accumulator = ctx->frame_time;
 
     while (ctx->accumulator >= ctx->fixed_step) {
