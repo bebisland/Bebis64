@@ -2,16 +2,16 @@
 #define BEBIS64_RESULT_H
 
 typedef enum {
-  RESULT_OK = 0,
-  RESULT_ERR_INIT,
-  RESULT_ERR_ALLOC,
-  RESULT_ERR_FILE,
-  RESULT_ERR_NULL
+	RESULT_OK = 0,
+	RESULT_ERR_INIT,
+	RESULT_ERR_ALLOC,
+	RESULT_ERR_FILE,
+	RESULT_ERR_NULL
 } ResultCode;
 
 typedef struct {
-  ResultCode code;
-  const char *message;
+	ResultCode code;
+	const char *message;
 } Result;
 
 Result result_ok(void);

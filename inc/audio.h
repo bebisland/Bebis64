@@ -4,9 +4,9 @@
 #include "result.h"
 
 typedef struct Audio {
-  Result (*init)(void);
-  void   (*update)(void);
-  Result (*shutdown)(void);
+	Result (*init)(void);
+	void (*update)(void);
+	Result (*shutdown)(void);
 } Audio;
 
 Audio *audio_get_raylib(void);

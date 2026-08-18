@@ -4,14 +4,15 @@
 #include "result.h"
 
 typedef struct Renderer {
-  Result (*init)(int width, int height, const char *title, unsigned char flags);
-  void   (*begin)(void);
-  void   (*clear)(void);
-  void   (*end)(void);
-  Result (*shutdown)(void);
-  int    (*should_close)(void);
-  float  (*get_delta)(void);
-  unsigned char flags;
+	Result (*init)(int width, int height, const char *title,
+		       unsigned char flags);
+	void (*begin)(void);
+	void (*clear)(void);
+	void (*end)(void);
+	Result (*shutdown)(void);
+	int (*should_close)(void);
+	float (*get_delta)(void);
+	unsigned char flags;
 } Renderer;
 
 Renderer *renderer_get_raylib(void);

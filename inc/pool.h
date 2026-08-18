@@ -5,11 +5,11 @@
 #include <stddef.h>
 
 typedef struct Pool {
-  unsigned char *buffer;
-  size_t block_size;
-  size_t block_count;
-  size_t free_count;
-  void *free_list;
+	unsigned char *buffer;
+	size_t block_size;
+	size_t block_count;
+	size_t free_count;
+	void *free_list;
 } Pool;
 
 Result pool_create(Pool *pool, size_t block_size, size_t block_count);

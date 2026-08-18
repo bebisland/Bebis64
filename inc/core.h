@@ -9,14 +9,14 @@
 #include "window.h"
 
 typedef struct CoreContext {
-  WindowSettings window;
-  Renderer *renderer;
-  Input *input;
-  Audio *audio;
-  Arena frame_arena;
-  float fixed_step;
-  float accumulator;
-  float frame_time;
+	WindowSettings window;
+	Renderer *renderer;
+	Input *input;
+	Audio *audio;
+	Arena frame_arena;
+	float fixed_step;
+	float accumulator;
+	float frame_time;
 } CoreContext;
 
 Result core_run(void);
